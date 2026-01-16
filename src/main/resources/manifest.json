@@ -1,17 +1,17 @@
 {
-  "Group": "TemplatePlugin",
-  "Name": "TemplatePlugin",
+  "Group": "Nightmare Mode",
+  "Name": "Nightmare Mode",
   "Version": "1.0.0",
   "Description": "A Hytale plugin template",
   "Authors": [
     {
-      "Name": "YourName",
-      "Email": "your.email@example.com",
-      "Url": "https://your-website.com"
+      "Name": "featureJosh",
+      "Email": "featurejosh@gmail.com",
+      "Url": "https://github.com/featureJosh"
     }
   ],
-  "Website": "https://github.com/yourusername/hytale-plugin-template",
-  "Main": "com.example.templateplugin.TemplatePlugin",
+  "Website": "https://github.com/featureJosh/Nightmare-Mode",
+  "Main": "com.mod.nightmaremode.NightmareMode",
   "ServerVersion": "*",
   "Dependencies": {},
   "OptionalDependencies": {},
