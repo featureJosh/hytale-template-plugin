@@ -1,6 +1,6 @@
 {
-  "Group": "Nightmare Mode",
-  "Name": "Nightmare Mode",
+  "Group": "com.mod.nightmaremode",
+  "Name": "NightmareMode",
   "Version": "1.0.0",
   "Description": "A Hytale plugin template",
   "Authors": [
@@ -15,5 +15,6 @@
   "ServerVersion": "*",
   "Dependencies": {},
   "OptionalDependencies": {},
-  "DisabledByDefault": false
+  "DisabledByDefault": false,
+  "IncludesAssetPack": false
 }
