@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 .kotlin/
 HyDifficulty-example-file/
+com/**
 
 # Personal
 .docs

@@ -3,6 +3,7 @@ package com.mod.nightmaremode;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.mod.nightmaremode.events.CombatListener;
+import java.util.logging.Level;
 
 public class NightmareMode extends JavaPlugin {
 
@@ -15,17 +16,18 @@ public class NightmareMode extends JavaPlugin {
 
     @Override
     public void setup() {
-        getEventRegistry().register(new CombatListener());
+        CombatListener combatListener = new CombatListener();
+        combatListener.register(getEventRegistry());
     }
 
     @Override
     public void start() {
-        getLogger().info("Nightmare Mode enabled!");
+        getLogger().at(Level.INFO).log("Nightmare Mode enabled!");
     }
 
     @Override
     public void shutdown() {
-        getLogger().info("Nightmare Mode disabled!");
+        getLogger().at(Level.INFO).log("Nightmare Mode disabled!");
     }
 
     public static NightmareMode getInstance() {

@@ -1,26 +1,20 @@
 package com.mod.nightmaremode.events;
 
-import com.hypixel.hytale.server.core.entity.Entity;
-import com.hypixel.hytale.server.core.entity.entities.player.Player;
-import com.hypixel.hytale.server.core.event.events.EntityDamageEvent;
-import com.hypixel.hytale.event.EventHandler;
+import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
+import com.hypixel.hytale.event.EventRegistry;
 
 public class CombatListener {
 
-    @EventHandler
-    public void onEntityDamage(EntityDamageEvent event) {
-        Entity attacker = event.getAttacker();
-        Entity target = event.getTarget();
+    public void register(EventRegistry eventRegistry) {
+        eventRegistry.register(PlayerConnectEvent.class, this::onPlayerConnect);
+    }
 
-        if (attacker instanceof Player) {
-            String targetName = target.getName();
-            player.sendMessage(player.getName() + " hit " + targetName);
-        }
-
-        if (target instanceof Player) {
-            Player player = (Player) target;
-            String attackerName = attacker.getName();
-            player.sendMessage(attackerName + " hit " + player.getName());
+    private void onPlayerConnect(PlayerConnectEvent event) {
+        Player player = event.getPlayer();
+        if (player != null) {
+            player.sendMessage(Message.raw(player.getDisplayName() + " connected!"));
         }
     }
 }
