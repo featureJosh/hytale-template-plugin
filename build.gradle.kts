@@ -51,10 +51,6 @@ tasks {
             "description" to project.description
         )
         inputs.properties(props)
-        
-        filesMatching("manifest.json") {
-            expand(props)
-        }
     }
     
     // Configure ShadowJar (bundle dependencies)
@@ -63,7 +59,7 @@ tasks {
         archiveClassifier.set("")
         
         // Relocate dependencies to avoid conflicts
-        relocate("com.google.gson", "com.yourplugin.libs.gson")
+        relocate("com.google.gson", "org.featureJosh.plugin.libs.gson")
         
         // Minimize JAR size (removes unused classes)
         minimize()

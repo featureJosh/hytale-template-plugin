@@ -1,20 +1,22 @@
 {
-  "Group": "com.mod.nightmaremode",
-  "Name": "NightmareMode",
-  "Version": "1.0.0",
-  "Description": "A Hytale plugin template",
-  "Authors": [
-    {
-      "Name": "featureJosh",
-      "Email": "featurejosh@gmail.com",
-      "Url": "https://github.com/featureJosh"
-    }
-  ],
-  "Website": "https://github.com/featureJosh/Nightmare-Mode",
-  "Main": "com.mod.nightmaremode.NightmareMode",
-  "ServerVersion": "*",
-  "Dependencies": {},
-  "OptionalDependencies": {},
-  "DisabledByDefault": false,
-  "IncludesAssetPack": false
+    "Group": "featureJosh",
+    "Name": "Souls Dodge",
+    "Version": "0.3.0",
+    "Description": "An dodge plugin for HyTale",
+    "Authors": [
+        {
+            "Name": "featureJosh"
+        }
+    ],
+    "Website": "",
+    "ServerVersion": "*",
+    "Dependencies": {
+        
+    },
+    "OptionalDependencies": {
+        
+    },
+    "DisabledByDefault": false,
+    "Main": "org.featureJosh.plugin.SoulsDodge",
+    "IncludesAssetPack": false
 }

@@ -5,7 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 .kotlin/
-HyDifficulty-example-file/
+performance-saver-1.0.0.jar_Decompiler.com/
 com/**
 
 # Personal

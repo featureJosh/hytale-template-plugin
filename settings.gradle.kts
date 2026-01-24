@@ -1,1 +1,1 @@
-rootProject.name = "Nightmare Mode"
+rootProject.name = "Souls Dodge"
