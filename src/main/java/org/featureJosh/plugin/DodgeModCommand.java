@@ -13,13 +13,12 @@ public class DodgeModCommand extends CommandBase {
     }
 
     protected void executeSync(@Nonnull CommandContext ctx) {
-        DodgeConfig config = DodgeConfig.get();
-        ctx.sendMessage(Message.raw("DodgeMod: Configurations"));
-        ctx.sendMessage(Message.raw("Dodge Cooldown: " + config.dodgeCooldownMs + "ms"));
-        ctx.sendMessage(Message.raw("iFrame Duration: " + config.iFrameDurationMs + "ms"));
-        ctx.sendMessage(Message.raw("Dodge Velocity: " + config.dodgeVelocity));
-        ctx.sendMessage(Message.raw("Vertical Hop: " + config.verticalHop));
-        ctx.sendMessage(Message.raw("Stamina Cost: " + config.staminaCost));
-        ctx.sendMessage(Message.raw("Air Dash: " + (config.allowAirDash ? "Enabled" : "Disabled")));
+        SoulsDodgeSettings settings = SoulsDodgeSettings.get();
+        ctx.sendMessage(Message.raw("Souls Dodge Settings"));
+        ctx.sendMessage(Message.raw("Cooldown: " + settings.cooldown + "ms"));
+        ctx.sendMessage(Message.raw("Invincibility: " + settings.invincibility + "ms"));
+        ctx.sendMessage(Message.raw("Speed: " + settings.speed));
+        ctx.sendMessage(Message.raw("Stamina: " + settings.stamina));
+        ctx.sendMessage(Message.raw("Air Dodge: " + (settings.airDodge ? "Enabled" : "Disabled")));
     }
 }

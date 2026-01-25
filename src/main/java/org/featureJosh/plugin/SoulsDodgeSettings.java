@@ -13,57 +13,55 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 
-public final class DodgeConfig {
+public final class SoulsDodgeSettings {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
-    private static DodgeConfig instance;
+    private static SoulsDodgeSettings instance;
 
-    public long dodgeCooldownMs;
-    public long iFrameDurationMs;
-    public float dodgeVelocity;
-    public float verticalHop;
-    public float staminaCost;
-    public boolean allowAirDash;
+    public long cooldown;
+    public long invincibility;
+    public float speed;
+    public float stamina;
+    public boolean airDodge;
 
     public static void load(File configDir, Gson gson) {
-        File diskFile = new File(configDir, "dodge_config.json");
-        DodgeConfig defaults = loadDefaults(gson);
-        DodgeConfig config;
+        File diskFile = new File(configDir, "settings.json");
+        SoulsDodgeSettings defaults = loadDefaults(gson);
+        SoulsDodgeSettings config;
 
         if (!diskFile.exists()) {
             config = defaults;
             save(diskFile, defaults, gson);
-            ((Api) LOGGER.atInfo()).log("DodgeConfig: Created new dodge_config.json");
+            ((Api) LOGGER.atInfo()).log("SoulsDodgeSettings: Created new settings.json");
         } else {
             config = loadAndMerge(diskFile, defaults, gson);
         }
 
         set(config);
-        ((Api) LOGGER.atInfo()).log("DodgeConfig: Loaded successfully");
+        ((Api) LOGGER.atInfo()).log("SoulsDodgeSettings: Loaded successfully");
     }
 
-    private static DodgeConfig loadDefaults(Gson gson) {
+    private static SoulsDodgeSettings loadDefaults(Gson gson) {
         try {
-            InputStream is = DodgeConfig.class.getClassLoader().getResourceAsStream("dodge_defaults.json");
+            InputStream is = SoulsDodgeSettings.class.getClassLoader().getResourceAsStream("dodge_defaults.json");
             if (is != null) {
-                DodgeConfig config = gson.fromJson(new InputStreamReader(is), DodgeConfig.class);
+                SoulsDodgeSettings config = gson.fromJson(new InputStreamReader(is), SoulsDodgeSettings.class);
                 is.close();
                 return config;
             }
         } catch (IOException e) {
-            ((Api) LOGGER.atWarning()).log("DodgeConfig: Failed to load defaults from JAR");
+            ((Api) LOGGER.atWarning()).log("SoulsDodgeSettings: Failed to load defaults from JAR");
         }
 
-        DodgeConfig defaults = new DodgeConfig();
-        defaults.dodgeCooldownMs = 500L;
-        defaults.iFrameDurationMs = 200L;
-        defaults.dodgeVelocity = 20.0F;
-        defaults.verticalHop = 0.1F;
-        defaults.staminaCost = 1.5F;
-        defaults.allowAirDash = false;
+        SoulsDodgeSettings defaults = new SoulsDodgeSettings();
+        defaults.cooldown = 500L;
+        defaults.invincibility = 200L;
+        defaults.speed = 20.0F;
+        defaults.stamina = 1.5F;
+        defaults.airDodge = false;
         return defaults;
     }
 
-    private static DodgeConfig loadAndMerge(File diskFile, DodgeConfig defaults, Gson gson) {
+    private static SoulsDodgeSettings loadAndMerge(File diskFile, SoulsDodgeSettings defaults, Gson gson) {
         try {
             FileReader reader = new FileReader(diskFile);
             JsonObject userJson = JsonParser.parseReader(reader).getAsJsonObject();
@@ -75,12 +73,12 @@ public final class DodgeConfig {
                 String key = keys.next();
                 if (!userJson.has(key)) {
                     userJson.add(key, defaultsJson.get(key));
-                    ((Api) LOGGER.atInfo()).log("DodgeConfig: Added missing field: " + key);
+                    ((Api) LOGGER.atInfo()).log("SoulsDodgeSettings: Added missing field: " + key);
                     updated = true;
                 }
             }
 
-            DodgeConfig config = gson.fromJson(userJson, DodgeConfig.class);
+            SoulsDodgeSettings config = gson.fromJson(userJson, SoulsDodgeSettings.class);
             reader.close();
 
             if (updated) {
@@ -89,26 +87,26 @@ public final class DodgeConfig {
 
             return config;
         } catch (IOException e) {
-            ((Api) LOGGER.atWarning()).log("DodgeConfig: Failed to read config; using defaults");
+            ((Api) LOGGER.atWarning()).log("SoulsDodgeSettings: Failed to read config; using defaults");
             return defaults;
         }
     }
 
-    private static void save(File file, DodgeConfig config, Gson gson) {
+    private static void save(File file, SoulsDodgeSettings config, Gson gson) {
         try {
             FileWriter writer = new FileWriter(file);
             gson.toJson(config, writer);
             writer.close();
         } catch (IOException e) {
-            ((Api) LOGGER.atWarning()).log("DodgeConfig: Failed to save config");
+            ((Api) LOGGER.atWarning()).log("SoulsDodgeSettings: Failed to save config");
         }
     }
 
-    public static void set(DodgeConfig config) {
+    public static void set(SoulsDodgeSettings config) {
         instance = config;
     }
 
-    public static DodgeConfig get() {
+    public static SoulsDodgeSettings get() {
         return instance;
     }
 }

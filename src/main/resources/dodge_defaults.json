@@ -1,8 +1,7 @@
 {
-  "dodgeCooldownMs": 800,
-  "iFrameDurationMs": 200,
-  "dodgeVelocity": 20.0,
-  "verticalHop": 0.1,
-  "staminaCost": 0.75,
-  "allowAirDash": false
+  "cooldown": 500,
+  "invincibility": 200,
+  "speed": 20.0,
+  "stamina": 1.5,
+  "airDodge": false
 }

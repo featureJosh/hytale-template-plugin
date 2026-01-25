@@ -47,13 +47,13 @@ public class DodgeSystem extends EntityTickingSystem<EntityStore> {
         DodgeComponent dodge = chunk.getComponent(index, this.dodgeComponentType);
         if (dodge == null) return;
 
-        DodgeConfig config = DodgeConfig.get();
+        SoulsDodgeSettings settings = SoulsDodgeSettings.get();
         TimeResource timeResource = store.getResource(TimeResource.getResourceType());
         long nowMs = timeResource.getNow().toEpochMilli();
 
         if (dodge.isDodging) {
             long elapsed = nowMs - dodge.dodgeStartTimeMs;
-            if (elapsed > config.iFrameDurationMs) {
+            if (elapsed > settings.invincibility) {
                 dodge.isDodging = false;
                 removeEffect(chunk.getReferenceTo(index), store, commandBuffer);
             } else {
@@ -64,9 +64,9 @@ public class DodgeSystem extends EntityTickingSystem<EntityStore> {
         if (!dodge.isQueuedDodge()) return;
         dodge.setQueuedDodge(false);
 
-        if (nowMs - dodge.lastDodgeTimeMs < config.dodgeCooldownMs) return;
+        if (nowMs - dodge.lastDodgeTimeMs < settings.cooldown) return;
 
-        if (!config.allowAirDash) {
+        if (!settings.airDodge) {
             MovementStatesComponent stateComp = chunk.getComponent(index, MovementStatesComponent.getComponentType());
             if (stateComp != null) {
                 MovementStates states = stateComp.getMovementStates();
@@ -79,9 +79,9 @@ public class DodgeSystem extends EntityTickingSystem<EntityStore> {
             EntityStatValue staminaStat = statMap.get(STAMINA_INDEX);
             if (staminaStat != null) {
                 float currentStamina = staminaStat.get();
-                if (currentStamina < config.staminaCost) return;
+                if (currentStamina < settings.stamina) return;
 
-                statMap.setStatValue(STAMINA_INDEX, currentStamina - config.staminaCost);
+                statMap.setStatValue(STAMINA_INDEX, currentStamina - settings.stamina);
                 SprintStaminaRegenDelay delayConfig = store.getResource(SprintStaminaRegenDelay.getResourceType());
                 if (delayConfig.hasDelay()) {
                     statMap.setStatValue(delayConfig.getIndex(), delayConfig.getValue());
@@ -93,7 +93,7 @@ public class DodgeSystem extends EntityTickingSystem<EntityStore> {
         dodge.dodgeStartTimeMs = nowMs;
         dodge.isDodging = true;
 
-        performDodge(index, chunk, config, dodge, commandBuffer, store);
+        performDodge(index, chunk, settings, dodge, commandBuffer, store);
     }
 
     private void enforceVelocity(int index, ArchetypeChunk<EntityStore> chunk, DodgeComponent dodge) {
@@ -116,7 +116,7 @@ public class DodgeSystem extends EntityTickingSystem<EntityStore> {
         }
     }
 
-    private void performDodge(int index, ArchetypeChunk<EntityStore> chunk, DodgeConfig config, DodgeComponent dodge, CommandBuffer<EntityStore> commandBuffer, Store<EntityStore> store) {
+    private void performDodge(int index, ArchetypeChunk<EntityStore> chunk, SoulsDodgeSettings settings, DodgeComponent dodge, CommandBuffer<EntityStore> commandBuffer, Store<EntityStore> store) {
         Velocity velocityComp = chunk.getComponent(index, Velocity.getComponentType());
         TransformComponent transformComp = chunk.getComponent(index, TransformComponent.getComponentType());
         if (velocityComp == null || transformComp == null) return;
@@ -135,9 +135,9 @@ public class DodgeSystem extends EntityTickingSystem<EntityStore> {
             dirZ = Math.cos(rotation.y);
         }
 
-        double velX = dirX * config.dodgeVelocity;
-        double velY = config.verticalHop;
-        double velZ = dirZ * config.dodgeVelocity;
+        double velX = dirX * settings.speed;
+        double velY = 0.1;
+        double velZ = dirZ * settings.speed;
 
         dodge.setDodgeVelocity(velX, velY, velZ);
 
@@ -156,7 +156,7 @@ public class DodgeSystem extends EntityTickingSystem<EntityStore> {
         broadcastAnimation(index, chunk, commandBuffer);
 
         Ref<EntityStore> entityRef = chunk.getReferenceTo(index);
-        applyEffect(entityRef, store, commandBuffer, config.iFrameDurationMs / 1000.0f);
+        applyEffect(entityRef, store, commandBuffer, settings.invincibility / 1000.0f);
     }
 
     private void broadcastAnimation(int index, ArchetypeChunk<EntityStore> chunk, CommandBuffer<EntityStore> commandBuffer) {

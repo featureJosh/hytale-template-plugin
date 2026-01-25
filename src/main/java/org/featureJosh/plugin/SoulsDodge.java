@@ -49,7 +49,7 @@ public class SoulsDodge extends JavaPlugin {
         if (!CONFIG_DIR.exists() && !CONFIG_DIR.mkdirs()) {
             ((Api) LOGGER.atWarning()).log("SoulsDodge: Failed to create config directory");
         }
-        DodgeConfig.load(CONFIG_DIR, GSON);
+        SoulsDodgeSettings.load(CONFIG_DIR, GSON);
     }
 
     private void initComponents() {
@@ -59,9 +59,9 @@ public class SoulsDodge extends JavaPlugin {
 
     private void initSystems() {
         ComponentRegistryProxy<EntityStore> registry = getEntityStoreRegistry();
-        registry.registerSystem(new PlayerJoinDodgeAdder(dodgeComponentType));
-        registry.registerSystem(new DodgeInvincibilitySystem(dodgeComponentType));
-        registry.registerSystem(new DodgeSystem(dodgeComponentType));
+        registry.registerSystem(new PlayerJoinDodgeAdder(dodgeComponentType), true);
+        registry.registerSystem(new DodgeInvincibilitySystem(dodgeComponentType), true);
+        registry.registerSystem(new DodgeSystem(dodgeComponentType), true);
     }
 
     private void initPacketHandler() {

@@ -7,11 +7,18 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.SystemGroup;
 import com.hypixel.hytale.component.query.Query;
+import com.hypixel.hytale.math.vector.Vector3d;
+import com.hypixel.hytale.protocol.Color;
+import com.hypixel.hytale.protocol.Direction;
+import com.hypixel.hytale.protocol.Position;
+import com.hypixel.hytale.protocol.packets.world.SpawnParticleSystem;
 import com.hypixel.hytale.server.core.entity.knockback.KnockbackComponent;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageEventSystem;
 import com.hypixel.hytale.server.core.modules.entity.damage.DamageModule;
 import com.hypixel.hytale.server.core.modules.time.TimeResource;
+import com.hypixel.hytale.server.core.universe.world.PlayerUtil;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
 
@@ -39,7 +46,7 @@ public class DodgeInvincibilitySystem extends DamageEventSystem {
         long nowMs = timeResource.getNow().toEpochMilli();
         long elapsed = nowMs - dodge.dodgeStartTimeMs;
 
-        if (elapsed > DodgeConfig.get().iFrameDurationMs) return;
+        if (elapsed > SoulsDodgeSettings.get().invincibility) return;
 
         event.setCancelled(true);
         event.setAmount(0.0F);
@@ -47,5 +54,21 @@ public class DodgeInvincibilitySystem extends DamageEventSystem {
 
         Ref<EntityStore> ref = chunk.getReferenceTo(index);
         commandBuffer.tryRemoveComponent(ref, KnockbackComponent.getComponentType());
+
+        TransformComponent transform = chunk.getComponent(index, TransformComponent.getComponentType());
+        if (transform != null) {
+            Vector3d pos = transform.getPosition();
+            Position particlePos = new Position(pos.x, pos.y + 1.5, pos.z);
+            SpawnParticleSystem packet = new SpawnParticleSystem(
+                "Daggers_Dash_Straight",
+                particlePos,
+                new Direction(0.0f, 0.0f, 0.0f),
+                2.0f,
+                new Color((byte)255, (byte)100, (byte)0)
+            );
+            PlayerUtil.forEachPlayerThatCanSeeEntity(ref, (entityRef, playerRef, accessor) -> {
+                playerRef.getPacketHandler().write(packet);
+            }, commandBuffer);
+        }
     }
 }
