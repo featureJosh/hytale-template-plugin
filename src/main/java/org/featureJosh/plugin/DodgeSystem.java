@@ -121,19 +121,11 @@ public class DodgeSystem extends EntityTickingSystem<EntityStore> {
         TransformComponent transformComp = chunk.getComponent(index, TransformComponent.getComponentType());
         if (velocityComp == null || transformComp == null) return;
 
-        Vector3d currentVel = velocityComp.getClientVelocity();
         Vector3f rotation = transformComp.getRotation();
 
-        double dirX, dirZ;
-        double speedSq = currentVel.x * currentVel.x + currentVel.z * currentVel.z;
-        if (speedSq > 0.01) {
-            double invSpeed = 1.0 / Math.sqrt(speedSq);
-            dirX = currentVel.x * invSpeed;
-            dirZ = currentVel.z * invSpeed;
-        } else {
-            dirX = Math.sin(rotation.y);
-            dirZ = Math.cos(rotation.y);
-        }
+        double dirX = Math.sin(rotation.y);
+        double dirZ = Math.cos(rotation.y);
+        dodge.dodgeDirection = DodgeComponent.DodgeDirection.FORWARD;
 
         double velX = dirX * settings.speed;
         double velY = 0.1;
@@ -153,20 +145,31 @@ public class DodgeSystem extends EntityTickingSystem<EntityStore> {
         velocityComp.getInstructions().clear();
         velocityComp.addInstruction(tempVelocity, (VelocityConfig) null, ChangeVelocityType.Set);
 
-        broadcastAnimation(index, chunk, commandBuffer);
+        broadcastAnimation(index, chunk, dodge, commandBuffer);
 
         Ref<EntityStore> entityRef = chunk.getReferenceTo(index);
         applyEffect(entityRef, store, commandBuffer, settings.invincibility / 1000.0f);
     }
 
-    private void broadcastAnimation(int index, ArchetypeChunk<EntityStore> chunk, CommandBuffer<EntityStore> commandBuffer) {
+
+    private void broadcastAnimation(int index, ArchetypeChunk<EntityStore> chunk, DodgeComponent dodge, CommandBuffer<EntityStore> commandBuffer) {
         NetworkId netId = chunk.getComponent(index, NetworkId.getComponentType());
         if (netId == null) return;
 
-        PlayAnimation packet = new PlayAnimation(netId.getId(), null, "Roll", AnimationSlot.Action);
+        String animationName = getAnimationForDirection(dodge.dodgeDirection);
+        PlayAnimation packet = new PlayAnimation(netId.getId(), null, animationName, AnimationSlot.Action);
         PlayerUtil.forEachPlayerThatCanSeeEntity(chunk.getReferenceTo(index), (ref, playerRef, accessor) -> {
             playerRef.getPacketHandler().write(packet);
         }, commandBuffer);
+    }
+
+    private String getAnimationForDirection(DodgeComponent.DodgeDirection direction) {
+        return switch (direction) {
+            case LEFT -> "RollLeft";
+            case RIGHT -> "RollRight";
+            case BACK, BACK_LEFT, BACK_RIGHT -> "RollBackward";
+            case FORWARD, FORWARD_LEFT, FORWARD_RIGHT -> "Roll";
+        };
     }
 
     private static void applyEffect(Ref<EntityStore> entityRef, Store<EntityStore> store, CommandBuffer<EntityStore> commandBuffer, float duration) {

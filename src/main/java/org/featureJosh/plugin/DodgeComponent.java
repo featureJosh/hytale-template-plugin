@@ -5,6 +5,10 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
 
 public class DodgeComponent implements Component<EntityStore> {
+    public enum DodgeDirection {
+        FORWARD, FORWARD_LEFT, FORWARD_RIGHT, BACK, BACK_LEFT, BACK_RIGHT, LEFT, RIGHT
+    }
+
     long lastDodgeTimeMs;
     long dodgeStartTimeMs;
     boolean isDodging;
@@ -13,6 +17,7 @@ public class DodgeComponent implements Component<EntityStore> {
     double dodgeVelocityY;
     double dodgeVelocityZ;
     float dodgeYaw;
+    DodgeDirection dodgeDirection = DodgeDirection.FORWARD;
 
     public boolean isQueuedDodge() {
         return this.queuedDodge;
@@ -39,6 +44,7 @@ public class DodgeComponent implements Component<EntityStore> {
         c.dodgeVelocityY = this.dodgeVelocityY;
         c.dodgeVelocityZ = this.dodgeVelocityZ;
         c.dodgeYaw = this.dodgeYaw;
+        c.dodgeDirection = this.dodgeDirection;
         return c;
     }
 }
