@@ -121,11 +121,21 @@ public class DodgeSystem extends EntityTickingSystem<EntityStore> {
         TransformComponent transformComp = chunk.getComponent(index, TransformComponent.getComponentType());
         if (velocityComp == null || transformComp == null) return;
 
+        Vector3d currentVel = velocityComp.getClientVelocity();
         Vector3f rotation = transformComp.getRotation();
 
-        double dirX = Math.sin(rotation.y);
-        double dirZ = Math.cos(rotation.y);
-        dodge.dodgeDirection = DodgeComponent.DodgeDirection.FORWARD;
+        double dirX, dirZ;
+        double speedSq = currentVel.x * currentVel.x + currentVel.z * currentVel.z;
+        if (speedSq > 0.01) {
+            double invSpeed = 1.0 / Math.sqrt(speedSq);
+            dirX = currentVel.x * invSpeed;
+            dirZ = currentVel.z * invSpeed;
+            dodge.dodgeDirection = calculateDodgeDirection(dirX, dirZ, rotation.y);
+        } else {
+            dirX = Math.sin(rotation.y);
+            dirZ = Math.cos(rotation.y);
+            dodge.dodgeDirection = DodgeComponent.DodgeDirection.FORWARD;
+        }
 
         double velX = dirX * settings.speed;
         double velY = 0.1;
@@ -151,6 +161,34 @@ public class DodgeSystem extends EntityTickingSystem<EntityStore> {
         applyEffect(entityRef, store, commandBuffer, settings.invincibility / 1000.0f);
     }
 
+    private DodgeComponent.DodgeDirection calculateDodgeDirection(double moveX, double moveZ, float playerYaw) {
+        double facingX = Math.sin(playerYaw);
+        double facingZ = Math.cos(playerYaw);
+
+        double dot = moveX * facingX + moveZ * facingZ;
+        double cross = moveX * facingZ - moveZ * facingX;
+
+        double angle = Math.atan2(-cross, -dot);
+        double degrees = Math.toDegrees(angle);
+
+        if (degrees >= -22.5 && degrees < 22.5) {
+            return DodgeComponent.DodgeDirection.FORWARD;
+        } else if (degrees >= 22.5 && degrees < 67.5) {
+            return DodgeComponent.DodgeDirection.FORWARD_LEFT;
+        } else if (degrees >= 67.5 && degrees < 112.5) {
+            return DodgeComponent.DodgeDirection.LEFT;
+        } else if (degrees >= 112.5 && degrees < 157.5) {
+            return DodgeComponent.DodgeDirection.BACK_LEFT;
+        } else if (degrees >= 157.5 || degrees < -157.5) {
+            return DodgeComponent.DodgeDirection.BACK;
+        } else if (degrees >= -157.5 && degrees < -112.5) {
+            return DodgeComponent.DodgeDirection.BACK_RIGHT;
+        } else if (degrees >= -112.5 && degrees < -67.5) {
+            return DodgeComponent.DodgeDirection.RIGHT;
+        } else {
+            return DodgeComponent.DodgeDirection.FORWARD_RIGHT;
+        }
+    }
 
     private void broadcastAnimation(int index, ArchetypeChunk<EntityStore> chunk, DodgeComponent dodge, CommandBuffer<EntityStore> commandBuffer) {
         NetworkId netId = chunk.getComponent(index, NetworkId.getComponentType());
